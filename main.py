@@ -32,7 +32,7 @@ mod = {}
 if args.stan_mod:
     mod = {'Stan': stan_mod}
 
-editor.proc_1(args.file, line_d=args.lines, new_headers=new_headers,
+editor.modify(args.file, line_d=args.lines, new_headers=new_headers,
               rem_headers=args.rem_headers, modifiers=mod, encoding=args.encoding, o_file=args.output)
 
 
