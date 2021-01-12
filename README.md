@@ -1,6 +1,12 @@
 # editorCSV
 CLI .csv/.xlsx files editor
 
+# Requirements
+Pandas python module is required
+```bash
+pip3 install pandas 
+```
+
 # Usage
 
 ```bash
