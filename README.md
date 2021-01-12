@@ -3,20 +3,48 @@ CLI .csv/.xlsx files editor
 
 # Usage
 
-## .csv
+```bash
+python3 main.py file.csv -o test.csv -a [file.csv | Header:test...] -r [header1 header2...] -n [file.csv | Name:NewName...] -l [int]
+```
+ 
+## -o Specifies output pathname, if its not passed then changes are made to source file. When working with many sheets in Excel file, 
+each one is saved in source file directory as sheet name
+
+## -a Adding new headers by file or inline
+
+```csv
+"Name";"Value"
+"family";"Test"
+"Price";"0"
+```
 
 ```bash
-python3 main.py ../cennik\(pln\)_2020-12-08_12-29\ 2.csv -o ../test.csv -a Family:test -r Lp -l 1 
+family:Test Price:0
 ```
--o - output file
 
--a - new headers Name:Value
+## -r Removing header by file or inline
 
--r - headers to remove
+```csv
+"Header"
+"Family"
+"Cena"
+```
 
--l - line skipping
+```bash
+Family Cena
+```
+## -n Renaming headers by file or inline
 
-## .xlsx
-The same way as with csv files. Editor finds out that it is excel file, on its own.
+```csv
+"Name";"NewName"
+"Price";"Cena"
+"family";"Family"
+```
 
-New files names are based on sheets names.
+```bash
+Price:Cena family:Family
+```
+
+## -l Number of lines to skip from start of source file, works only with .csv.
+
+## -d Set Delimiter for input and output
