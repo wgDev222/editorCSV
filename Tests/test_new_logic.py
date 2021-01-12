@@ -1,5 +1,5 @@
 import unittest
-from new_logic import Editor, Validator, Parser
+from logic import Editor, Validator, Parser
 import pandas as pd
 import os.path
 from os import remove
@@ -7,22 +7,30 @@ from os import remove
 
 class TestEditor(unittest.TestCase):
     def test_read_csv_file(self):
-        source_file = 'Data/test_read.csv'
-        output_df = Editor.read(source_file, 0)
+        source_file = 'Tests/Files/test_read.csv'
+        output_df = Editor.read(source_file)
         check_df = pd.read_csv(source_file, sep=';', skiprows=0)
 
         self.assertTrue(check_df.equals(output_df))
 
+    def test_read_csv_delimiter(self):
+        source_file = 'Tests/Files/test_read_delimiter.csv'
+        source_delimiter = ':'
+
+        output_df = Editor.read(source_file, delimiter=source_delimiter)
+        check_df = pd.read_csv(source_file, sep=source_delimiter)
+
+        self.assertTrue(check_df.equals(output_df))
+
     def test_blank_lines(self):
-        source_file = 'Data/test_blank_lines.csv'
+        source_file = 'Tests/Files/test_blank_lines.csv'
         blank_lines = 2
         cols = 6
         output_df = Editor.read(source_file, blank_lines)
-
         self.assertEqual(len(output_df.columns), cols)
 
     def test_removing_headers(self):
-        source_file = 'Data/test.csv'
+        source_file = 'Tests/Files/test.csv'
         output_df = Editor.read(source_file, 0)
         headers_to_remove = ['Symbol', 'Stan']
 
@@ -34,7 +42,7 @@ class TestEditor(unittest.TestCase):
         self.assertTrue(modified_df.columns.equals(check_df.columns))
 
     def test_adding_headers(self):
-        source_file = 'Data/test.csv'
+        source_file = 'Tests/Files/test.csv'
         output_df = Editor.read(source_file, 0)
         headers_to_add = {'Family': 'test', 'Sale': True}
 
@@ -46,9 +54,21 @@ class TestEditor(unittest.TestCase):
 
         self.assertTrue(modified_df.columns.equals(check_df.columns))
 
+    def test_renaming_headers(self):
+        source_file = 'Tests/Files/test.csv'
+        output_df = Editor.read(source_file, 0)
+        headers_to_rename = {'family': 'Family', 'Sale': 'SALE'}
+
+        check_df = pd.read_csv(source_file, sep=';')
+        check_df.rename(columns=headers_to_rename, inplace=True)
+
+        modified_df = Editor.rename_headers(output_df, headers_to_rename)
+
+        self.assertTrue(modified_df.columns.equals(check_df.columns))
+
     def test_saving_file_to_csv(self):
-        source_file = 'Data/test.csv'
-        output_filepath = 'Data/renamed.csv'
+        source_file = 'Tests/Files/test.csv'
+        output_filepath = 'Tests/Files/renamed.csv'
 
         df = Editor.read(source_file, 0)
         Editor.save(df, output_filepath)
@@ -59,25 +79,50 @@ class TestEditor(unittest.TestCase):
 
         remove(output_filepath)
 
+    def test_saving_file_to_csv_delimiter(self):
+        source_file = 'Tests/Files/test.csv'
+        output_filepath = 'Tests/Files/new.csv'
+        check_filepath = 'Tests/Files/check.csv'
+
+        output_delimiter = ':'
+
+        output_df = Editor.read(source_file)
+        Editor.save(output_df, output_filepath, delimiter=output_delimiter)
+
+        check_df = pd.read_csv(source_file, sep=';')
+        check_df.to_csv(check_filepath, sep=output_delimiter, index=False)
+
+        output_df = pd.read_csv(output_filepath, sep=output_delimiter)
+        check_df = pd.read_csv(check_filepath, sep=output_delimiter)
+
+        self.assertTrue(check_df.equals(output_df))
+
+        remove(output_filepath)
+        remove(check_filepath)
+
+
+
+
 class TestValidate(unittest.TestCase):
     def test_path_existence(self):
         self.assertFalse(Validator.dir('Path'))
-        self.assertTrue(Validator.dir('Data'))
+        self.assertTrue(Validator.dir('Tests/Files'))
 
     def test_file_existence(self):
-        self.assertTrue(Validator.file('Data/h_add.csv'))
+        self.assertTrue(Validator.file('Tests/Files/h_add.csv'))
         self.assertFalse(Validator.file('h_add.csv'))
         self.assertFalse(Validator.file('Data/header'))
 
 
 class TestParser(unittest.TestCase):
     def test_parsing_new_headers_file(self):
-        arg = 'Data/h_add.csv'
+        arg = ['Tests/Files/h_add.csv']
 
-        check_df = pd.read_csv(arg, sep=';')
+        check_df = pd.read_csv(arg[0], sep=';')
         check_headers = check_df.set_index('Name').to_dict('dict')['Value']
 
         headers = Parser.new_headers(arg)
+
         self.assertEqual(headers, check_headers)
 
     def test_parsing_new_headers_inline(self):
@@ -93,15 +138,13 @@ class TestParser(unittest.TestCase):
         headers = Parser.new_headers(arg)
         self.assertEqual(headers, check_headers)
 
-
     def test_parsing_rem_headers_file(self):
-        arg = 'Data/h_remove.csv'
+        arg = ['Tests/Files/h_remove.csv']
 
-        check_df = pd.read_csv(arg, sep=';')
+        check_df = pd.read_csv(arg[0], sep=';')
         check_headers = check_df['Header'].tolist()
 
         headers = Parser.rem_headers(arg)
-
         self.assertEqual(headers, check_headers)
 
     def test_parsing_rem_headers_inline(self):
@@ -114,9 +157,9 @@ class TestParser(unittest.TestCase):
         self.assertEqual(headers, check_headers)
 
     def test_parsing_rename_headers_file(self):
-        arg = 'Data/h_rename.csv'
+        arg = ['Tests/Files/h_rename.csv']
 
-        check_df = pd.read_csv(arg, sep=';')
+        check_df = pd.read_csv(arg[0], sep=';')
         check_headers = check_df.set_index('Name').to_dict('dict')['NewName']
 
         headers = Parser.rename_headers(arg)

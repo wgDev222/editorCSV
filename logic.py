@@ -1,152 +1,144 @@
-import csv
-from os import remove, path, listdir
 import pandas as pd
-from pathlib import Path
+import os.path
 
-# import xlrd
-
-
-class Validation:
+class Editor:
     @staticmethod
-    def check_key(key, _dict, msg, exists=True):
-        if exists:
-            if key in _dict:
-                print(msg)
-                return False
-                # raise Exception(msg)
-        else:
-            if key not in _dict:
-                print(msg)
-                return False
-                # raise Exception(msg)
-        return True
+    def read(filename, lines_skipped=0, delimiter=';'):
+        file_extenstion = os.path.splitext(filename)[1]
 
-class Decoding:
+        if file_extenstion == '.xlsx':
+            df_sheets = pd.read_excel('Data/test2.xlsx', sheet_name=None)
+            return df_sheets
+        elif file_extenstion == '.csv':
+            df = pd.read_csv(filename, sep=delimiter, skiprows=lines_skipped)
+            return df
+
     @staticmethod
-    def to_utf8(file):
-        with open(file, 'rb') as f:
-            text = f.read()
+    def save(df, filepath, delimiter=';'):
+        df.to_csv(filepath, sep=delimiter, index=False)
 
-        with open(file, 'w') as f:
-            f.write(text.decode('iso-8859-2'))
-
-class Convert:
     @staticmethod
-    def to_csv(file, _path=''):
-        output_path = Path(_path)
+    def rem_headers(df, headers_to_remove):
+        result_df = df
+        result_df.drop(columns=headers_to_remove, inplace=True)
+        return result_df
 
-        sheets = pd.read_excel(file, sheet_name=None)
-        files = []
-        for key, s in sheets.items():
-            filename = output_path / f"{key}.csv"
-            files.append(filename)
-            s.to_csv(filename, index=None, header=True, sep=';')
-        return files
+    @staticmethod
+    def add_headers(df, headers_to_add):
+        result_df = df
 
-class CSVEditor:
+        for header, value in headers_to_add.items():
+            result_df[header] = value
 
-    def __init__(self, delimiter=','):
-        self.__delimiter = delimiter
+        return result_df
 
-    def get_delimiter(self):
-        return self.__delimiter
+    @staticmethod
+    def rename_headers(df, headers_to_rename):
+        result_df = df
+        result_df.rename(columns=headers_to_rename, inplace=True)
 
-    def set_delimiter(self, delimiter):
-        self.__delimiter = delimiter
+        return result_df
 
-    def modify(self, file, new_headers, rem_headers, modifiers, line_d=0, encoding='utf-8', o_file=False):
-        filename, file_extension = path.splitext(file)
-        csv_files = []
-        if file_extension == '.xlsx':
-            csv_files = Convert.to_csv(file)
-        elif file_extension == '':
-            for entry in listdir(file):
-                if path.isfile(path.join(file, entry)):
-                    print(entry)
+
+class Parser:
+    @staticmethod
+    def new_headers(arg):
+        try:
+            test_arg = arg[0]
+        except IndexError:
+            return {}
+        headers_to_add = {}
+        if Validator.file(test_arg):
+            df = Editor.read(test_arg)
+            headers_to_add = df.set_index('Name').to_dict('dict')['Value']
         else:
-            csv_files.append(Path(file))
-        for csv_file in csv_files:
-            self.__process(csv_file, encoding, line_d, new_headers, rem_headers, modifiers, o_file)
+            for header in arg:
+                items = header.split(':')
+                if len(items) == 1:
+                    items.append('')
+                headers_to_add[items[0]] = items[1]
 
-    def __process(self, file, encoding, line_d, new_headers, rem_headers, modifiers, o_file):
-        with open(file, encoding=encoding) as csv_file:
-            # Lines skipping
-            for i in range(line_d):
-                next(csv_file)
+        return headers_to_add
 
-            csv_reader = csv.DictReader(csv_file, delimiter=self.__delimiter)
-            fieldnames = csv_reader.fieldnames.copy()
-
-            for header in new_headers.keys():
-                if Validation.check_key(header, fieldnames, f"Warning: New Header - {header} - already exists."):
-                    fieldnames.append(header)
-                else:
-                    new_headers = {}
-
-            for header in rem_headers:
-                if Validation.check_key(header, fieldnames, f"Warning: Header - {header} - can't be removed, because it doesn't exist", exists=False):
-                    fieldnames.remove(header)
-                else:
-                    rem_headers = []
-            print(fieldnames)
-            self.__save(fieldnames, csv_reader, new_headers, modifiers, rem_headers)
-            self.__write(o_file, file)
-
-            remove('temp.csv')
-
-    def __save(self, fieldnames, csv_reader, new_headers, modifiers, rem_headers):
-        with open('temp.csv', 'w') as result_file:
-            csv_writer = csv.DictWriter(result_file, fieldnames=fieldnames, delimiter=self.__delimiter, quotechar='"',
-                                        quoting=csv.QUOTE_ALL)
-
-            csv_writer.writeheader()
-
-            for line in csv_reader:
-                # Adding new headers with default values
-                for header, value in new_headers.items():
-                    line[header] = value
-
-                # Removing headers
-                for header in rem_headers:
-                    del line[header]
-
-                # modifying values
-                for header, func in modifiers.items():
-                    Validation.check_key(header, line,
-                                         f"Warning: Header - {header} - can't be modified, because it doesn't exist",
-                                         exists=False)
-                    line[header] = func(line[header])
-                csv_writer.writerow(line)
-
-    def __write(self, o_file, s_file):
-        with open('temp.csv', 'r') as r:
-            f = o_file or s_file
-            with open(f, 'w') as o:
-                for line in r:
-                    o.write(line)
-
-    def main(self, file, o_path):
-        filename, file_extension = path.splitext(file)
-        csv_files = []
-
-        if file_extension == '.xlsx':
-            csv_files = Convert.to_csv(file, o_path)
-            print(csv_files)
+    @staticmethod
+    def rem_headers(arg):
+        try:
+            test_arg = arg[0]
+        except IndexError:
+            return []
+        headers_to_remove = []
+        if Validator.file(test_arg):
+            df = Editor.read(test_arg)
+            headers_to_remove = df['Header'].tolist()
         else:
-            csv_files.append(Path(file))
+            return arg
 
-        for csv_file in csv_files:
-            self.modify(csv_file, new_headers={'Family': 'test'}, rem_headers=[], modifiers={})
+        return headers_to_remove
+
+    @staticmethod
+    def rename_headers(arg):
+        try:
+            test_arg = arg[0]
+        except IndexError:
+            return {}
+        headers_to_rename = {}
+        if Validator.file(test_arg):
+            df = Editor.read(test_arg)
+            headers_to_rename = df.set_index('Name').to_dict('dict')['NewName']
+        else:
+            for header in arg:
+                items = header.split(':')
+                if len(items) == 1:
+                    items.append('')
+                headers_to_rename[items[0]] = items[1]
+
+        return headers_to_rename
 
 
-def stan_mod(value):
-    return 0 if value == 'brak' else 1
+class Validator:
+    @staticmethod
+    def dir(path):
+        if os.path.exists(path) and os.path.isdir(path):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def file(filepath):
+        return os.path.isfile(filepath)
 
 
-# editor = CSVEditor(';')
-#
-# editor.proc_1('part.csv', line_d=1, new_headers={'Family': 'test'},
-#               rem_headers=['Lp'], modifiers={'Stan': stan_mod})
+class Change:
+    def __init__(self, header, new_name='', value=''):
+        self.header = header
+        self.new_name = new_name
+        self.value = value
 
-# c = CSVEditor(',')
-# c.main('test_read.csv', '')
+
+def execute_logic(args):
+    if Validator.file(args.file):
+        dfs = Editor.read(args.file, lines_skipped=args.lines, delimiter=args.delimiter)
+        if isinstance(dfs, pd.DataFrame):
+            modify_df(args, dfs)
+        elif isinstance(dfs, dict):
+            for filename, df in dfs.items():
+                filename += '.csv'
+                path = os.path.split(args.file)[0]
+                args.output = os.path.join(path, filename)
+                modify_df(args, df)
+    else:
+        raise Exception('Error: Source file does not exist')
+
+def modify_df(args, df):
+    if not args.output:
+        args.output = args.file
+
+    headers_add = Parser.new_headers(args.add_headers)
+    headers_remove = Parser.rem_headers(args.rem_headers)
+    headers_rename = Parser.rename_headers(args.rename_headers)
+
+    df = Editor.add_headers(df, headers_add)
+    df = Editor.rem_headers(df, headers_remove)
+    df = Editor.rename_headers(df, headers_rename)
+
+    Editor.save(df, args.output, delimiter=args.delimiter)
