@@ -121,8 +121,9 @@ def execute_logic(args):
         if isinstance(dfs, pd.DataFrame):
             modify_df(args, dfs)
         elif isinstance(dfs, dict):
+            prefix = args.output
             for filename, df in dfs.items():
-                filename = args.output + filename +'.csv'
+                filename = prefix + filename + '.csv'
                 path = os.path.split(args.file)[0]
                 args.output = os.path.join(path, filename)
                 modify_df(args, df)
