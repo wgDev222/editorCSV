@@ -122,7 +122,7 @@ def execute_logic(args):
             modify_df(args, dfs)
         elif isinstance(dfs, dict):
             for filename, df in dfs.items():
-                filename += '.csv'
+                filename = args.output + filename +'.csv'
                 path = os.path.split(args.file)[0]
                 args.output = os.path.join(path, filename)
                 modify_df(args, df)
