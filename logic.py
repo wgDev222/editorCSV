@@ -7,7 +7,7 @@ class Editor:
         file_extenstion = os.path.splitext(filename)[1]
 
         if file_extenstion == '.xlsx':
-            df_sheets = pd.read_excel('Data/test2.xlsx', sheet_name=None)
+            df_sheets = pd.read_excel(filename, sheet_name=None)
             return df_sheets
         elif file_extenstion == '.csv':
             df = pd.read_csv(filename, sep=delimiter, skiprows=lines_skipped)
