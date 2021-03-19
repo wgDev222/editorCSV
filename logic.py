@@ -7,7 +7,7 @@ class Editor:
         file_extenstion = os.path.splitext(filename)[1]
 
         if file_extenstion == '.xlsx':
-            df_sheets = pd.read_excel('Data/test2.xlsx', sheet_name=None)
+            df_sheets = pd.read_excel(filename, sheet_name=None)
             return df_sheets
         elif file_extenstion == '.csv':
             df = pd.read_csv(filename, sep=delimiter, skiprows=lines_skipped)
@@ -121,8 +121,9 @@ def execute_logic(args):
         if isinstance(dfs, pd.DataFrame):
             modify_df(args, dfs)
         elif isinstance(dfs, dict):
+            prefix = args.output
             for filename, df in dfs.items():
-                filename += '.csv'
+                filename = prefix + filename + '.csv'
                 path = os.path.split(args.file)[0]
                 args.output = os.path.join(path, filename)
                 modify_df(args, df)

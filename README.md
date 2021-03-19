@@ -5,6 +5,7 @@ CLI .csv/.xlsx files editor
 Pandas python module is required
 ```bash
 pip3 install pandas 
+pip3 install openpyxl
 ```
 
 # Usage
