@@ -5,6 +5,7 @@ from logic import execute_logic
 from os import remove
 from logic import Editor
 
+'''
 class TestCLI(unittest.TestCase):
     def test_saving_to_new_csv_file(self):
         params = 'Tests/Files/test.csv -o Data/new.csv'
@@ -38,3 +39,4 @@ class TestCLI(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+'''

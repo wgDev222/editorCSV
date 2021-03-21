@@ -100,9 +100,6 @@ class TestEditor(unittest.TestCase):
         remove(output_filepath)
         remove(check_filepath)
 
-
-
-
 class TestValidate(unittest.TestCase):
     def test_path_existence(self):
         self.assertFalse(Validator.dir('Path'))
