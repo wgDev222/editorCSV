@@ -14,8 +14,9 @@ pip3 install openpyxl
 python3 main.py file.csv -o test.csv -a [file.csv | Header:test...] -r [header1 header2...] -n [file.csv | Name:NewName...] -l [int]
 ```
  
-## -o Specifies output pathname, if its not passed then changes are made to source file. When working with many sheets in Excel file, 
-each one is saved in source file directory as sheet name
+## -o Specifies output pathname, if its not passed then changes are made to source file. When working with many sheets in Excel file, each one is saved in source file directory as sheet name
+
+If you are using csv files as arguments first line must have headers, specified below.
 
 ## -a Adding new headers by file or inline
 
