@@ -54,6 +54,21 @@ class TestEditor(unittest.TestCase):
 
         self.assertTrue(modified_df.columns.equals(check_df.columns))
 
+    def test_duplicating_headers(self):
+        source_file = 'Tests/Files/test.csv'
+        output_df = Editor.read(source_file, 0)
+        headers_to_dupl = {'Nazwa': 'Name', 'Symbol': 'Znak'}
+
+        check_df = pd.read_csv(source_file, sep=';')
+        for header, duplicate_header in headers_to_dupl.items():
+            col = check_df[header]
+            dupl_col_index = check_df.columns.get_loc(header) + 1
+            check_df.insert(dupl_col_index, duplicate_header, col, True)
+
+        modified_df = Editor.duplicate_headers(output_df, headers_to_dupl)
+
+        self.assertTrue(modified_df.columns.equals(check_df.columns))
+
     def test_renaming_headers(self):
         source_file = 'Tests/Files/test.csv'
         output_df = Editor.read(source_file, 0)
@@ -124,6 +139,29 @@ class TestParser(unittest.TestCase):
 
     def test_parsing_new_headers_inline(self):
         arg = ['Family:test', 'Price:Much']
+
+        check_headers = {}
+        for header in arg:
+            items = header.split(':')
+            if len(items) == 1:
+                items.append('')
+            check_headers[items[0]] = items[1]
+
+        headers = Parser.new_headers(arg)
+        self.assertEqual(headers, check_headers)
+
+    def test_parsing_dupl_headers_file(self):
+        arg = ['Tests/Files/h_duplicate.csv']
+
+        check_df = pd.read_csv(arg[0], sep=';')
+        check_headers = check_df.set_index('Header').to_dict('dict')['Header_D']
+
+        headers = Parser.duplicate_headers(arg)
+
+        self.assertEqual(headers, check_headers)
+
+    def test_parsing_dupl_headers_inline(self):
+        arg = ['Nazwa:Name', 'Symbol:Znak']
 
         check_headers = {}
         for header in arg:

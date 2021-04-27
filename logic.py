@@ -39,6 +39,18 @@ class Editor:
 
         return result_df
 
+    @staticmethod
+    def duplicate_headers(df, headers_to_dupl):
+        result_df = df
+
+        for header, duplicate_header in headers_to_dupl.items():
+            col = df[header]
+            dupl_col_index = df.columns.get_loc(header)+1
+
+            df.insert(dupl_col_index, duplicate_header, col, True)
+
+        return result_df
+
 
 class Parser:
     @staticmethod
@@ -59,6 +71,26 @@ class Parser:
                 headers_to_add[items[0]] = items[1]
 
         return headers_to_add
+
+    @staticmethod
+    def duplicate_headers(arg):
+        try:
+            test_arg = arg[0]
+        except IndexError:
+
+            return {}
+        headers_to_dupli = {}
+        if Validator.file(test_arg):
+            df = Editor.read(test_arg)
+            headers_to_dupli = df.set_index('Header').to_dict('dict')['Header_D']
+        else:
+            for header in arg:
+                items = header.split(':')
+                if len(items) == 1:
+                    items.append('')
+                headers_to_dupli[items[0]] = items[1]
+
+        return headers_to_dupli
 
     @staticmethod
     def rem_headers(arg):
@@ -137,9 +169,11 @@ def modify_df(args, df):
     headers_add = Parser.new_headers(args.add_headers)
     headers_remove = Parser.rem_headers(args.rem_headers)
     headers_rename = Parser.rename_headers(args.rename_headers)
+    headers_dupli = Parser.duplicate_headers(args.duplicate_headers)
 
     df = Editor.add_headers(df, headers_add)
     df = Editor.rem_headers(df, headers_remove)
     df = Editor.rename_headers(df, headers_rename)
+    df = Editor.duplicate_headers(df, headers_dupli)
 
     Editor.save(df, args.output, delimiter=args.delimiter)

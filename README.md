@@ -30,6 +30,18 @@ If you are using csv files as arguments first line must have headers, specified 
 family:Test Price:0
 ```
 
+## -c Duplicating headers by file or inline
+
+```csv
+"Header";"Header_D"
+"Price";"Cena"
+"Amount";"Ilosc"
+```
+
+```bash
+Price:Cena Amount:Ilosc
+```
+
 ## -r Removing header by file or inline
 
 ```csv
