@@ -18,6 +18,12 @@ python3 main.py file.csv -o test.csv -a [file.csv | Header:test...] -r [header1 
 
 If you are using csv files as arguments first line must have headers, specified below.
 
+Order of editing actions:
+1. Adding
+2. Removing
+3. Renaming
+4. Duplicating
+
 ## -a Adding new headers by file or inline
 
 ```csv
@@ -28,18 +34,6 @@ If you are using csv files as arguments first line must have headers, specified 
 
 ```bash
 family:Test Price:0
-```
-
-## -c Duplicating headers by file or inline
-
-```csv
-"Header";"Header_D"
-"Price";"Cena"
-"Amount";"Ilosc"
-```
-
-```bash
-Price:Cena Amount:Ilosc
 ```
 
 ## -r Removing header by file or inline
@@ -63,6 +57,18 @@ Family Cena
 
 ```bash
 Price:Cena family:Family
+```
+
+## -c Duplicating headers by file or inline
+
+```csv
+"Header";"Header_D"
+"Price";"Cena"
+"Amount";"Ilosc"
+```
+
+```bash
+Price:Cena Amount:Ilosc
 ```
 
 ## -l Number of lines to skip from start of source file, works only with .csv.
