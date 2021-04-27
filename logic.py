@@ -1,6 +1,8 @@
 import pandas as pd
 import os.path
 
+STRING_QUOTING = True
+
 class Editor:
     @staticmethod
     def read(filename, lines_skipped=0, delimiter=';'):
@@ -15,7 +17,10 @@ class Editor:
 
     @staticmethod
     def save(df, filepath, delimiter=';'):
-        df.to_csv(filepath, sep=delimiter, index=False)
+        quoting = 1
+        if not STRING_QUOTING:
+            quoting = 0
+        df.to_csv(filepath, sep=delimiter, index=False, quoting=quoting)
 
     @staticmethod
     def rem_headers(df, headers_to_remove):
