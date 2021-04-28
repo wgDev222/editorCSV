@@ -22,8 +22,9 @@ Order of editing actions:
 1. Adding
 2. Removing
 3. Renaming
-4. Strping values 
-5. Duplicating
+4. Strping values
+5. Deleting duplicate rows
+6. Duplicating
 
 ## -a Adding new headers by file or inline
 
