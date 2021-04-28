@@ -115,6 +115,24 @@ class TestEditor(unittest.TestCase):
         remove(output_filepath)
         remove(check_filepath)
 
+    def test_striping_values(self):
+        source_file = 'Tests/Files/test.csv'
+        output_df = Editor.read(source_file, 0)
+        values_to_strip = {'Symbol': 1, 'Nazwa': -1}
+
+        check_df = pd.read_csv(source_file, sep=';')
+
+        for header, n in values_to_strip.items():
+            if n >= 0:
+                check_df[header] = check_df[header].apply(lambda x: x[n:])
+            else:
+                check_df[header] = check_df[header].apply(lambda x: x[:n])
+
+        modified_df = Editor.strip_values(output_df, values_to_strip)
+
+        self.assertTrue(modified_df.columns.equals(check_df.columns))
+
+
 class TestValidate(unittest.TestCase):
     def test_path_existence(self):
         self.assertFalse(Validator.dir('Path'))
@@ -211,6 +229,15 @@ class TestParser(unittest.TestCase):
             check_headers[items[0]] = items[1]
 
         headers = Parser.rename_headers(arg)
+        self.assertEqual(headers, check_headers)
+
+    def test_parsing_striping_values_file(self):
+        arg = 'Tests/Files/strip.csv'
+
+        check_df = pd.read_csv(arg, sep=';')
+        check_headers = check_df.set_index('Header').to_dict('dict')['Num']
+
+        headers = Parser.strip_values(arg)
         self.assertEqual(headers, check_headers)
 
 

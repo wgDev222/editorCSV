@@ -22,7 +22,8 @@ Order of editing actions:
 1. Adding
 2. Removing
 3. Renaming
-4. Duplicating
+4. Strping values 
+5. Duplicating
 
 ## -a Adding new headers by file or inline
 
@@ -57,6 +58,15 @@ Family Cena
 
 ```bash
 Price:Cena family:Family
+```
+
+## -s Striping character from values of given column only by file
+Negative values strip characters from the end 
+
+```csv
+"Header";"Num";
+"Model";"1"
+"family";"-1"
 ```
 
 ## -c Duplicating headers by file or inline

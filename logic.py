@@ -56,6 +56,18 @@ class Editor:
 
         return result_df
 
+    @staticmethod
+    def strip_values(df, values_to_strip):
+        result_df = df
+
+        for header, n in values_to_strip.items():
+            if n >= 0:
+                df[header] = df[header].apply(lambda x: x[n:])
+            else:
+                df[header] = df[header].apply(lambda x: x[:n])
+
+        return result_df
+
 
 class Parser:
     @staticmethod
@@ -131,6 +143,14 @@ class Parser:
 
         return headers_to_rename
 
+    @staticmethod
+    def strip_values(arg):
+        if Validator.file(arg):
+            df = Editor.read(arg)
+            strip_values = df.set_index('Header').to_dict('dict')['Num']
+            return strip_values
+        else:
+            return {}
 
 class Validator:
     @staticmethod
@@ -175,10 +195,12 @@ def modify_df(args, df):
     headers_remove = Parser.rem_headers(args.rem_headers)
     headers_rename = Parser.rename_headers(args.rename_headers)
     headers_dupli = Parser.duplicate_headers(args.duplicate_headers)
+    header_to_strip = Parser.strip_values(args.strip_values)
 
     df = Editor.add_headers(df, headers_add)
     df = Editor.rem_headers(df, headers_remove)
     df = Editor.rename_headers(df, headers_rename)
+    df = Editor.strip_values(df, header_to_strip)
     df = Editor.duplicate_headers(df, headers_dupli)
 
     Editor.save(df, args.output, delimiter=args.delimiter)
