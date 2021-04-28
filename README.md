@@ -84,3 +84,5 @@ Price:Cena Amount:Ilosc
 ## -l Number of lines to skip from start of source file, works only with .csv.
 
 ## -d Set Delimiter for input and output
+
+## --dd Drop duplicates

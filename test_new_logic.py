@@ -132,6 +132,18 @@ class TestEditor(unittest.TestCase):
 
         self.assertTrue(modified_df.columns.equals(check_df.columns))
 
+    def test_deleting_duplicates(self):
+        source_file = 'Tests/Files/test.csv'
+        output_df = Editor.read(source_file, 0)
+        check_df = pd.read_csv(source_file, sep=';')
+
+        check_df = check_df.drop_duplicates()
+
+        modified_df = Editor.delete_duplicates(output_df)
+
+        self.assertTrue(modified_df.columns.equals(check_df.columns))
+
+
 
 class TestValidate(unittest.TestCase):
     def test_path_existence(self):

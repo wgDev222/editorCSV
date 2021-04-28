@@ -17,8 +17,8 @@ parser.add_argument('-n', '--rename_headers', action='store', type=str, nargs='*
 parser.add_argument('-d', '--delimiter', action='store', default=';', type=str, help='Delimiter for csv')
 parser.add_argument('-c', '--duplicate_headers', action='store', type=str, nargs='*', default=[],
                     help='Headers to Duplicate')
-parser.add_argument('-s', '--strip_values', action='store', type=str, default=False, help='Remove character from specified')
-
+parser.add_argument('-s', '--strip_values', action='store', type=str, default=False, help='Strips values from specified column')
+parser.add_argument('--dd', action='store_true', help='Deletes duplicate rows')
 # parser.add_argument('-q', '--quotes', action='store', default=';', type=str, help='String quotes for result file')
 
 if __name__ == '__main__':

@@ -68,6 +68,11 @@ class Editor:
 
         return result_df
 
+    @staticmethod
+    def delete_duplicates(df):
+        result_df = df.drop_duplicates()
+        return result_df
+
 
 class Parser:
     @staticmethod
@@ -201,6 +206,8 @@ def modify_df(args, df):
     df = Editor.rem_headers(df, headers_remove)
     df = Editor.rename_headers(df, headers_rename)
     df = Editor.strip_values(df, header_to_strip)
+    if args.dd:
+        df = Editor.delete_duplicates(df)
     df = Editor.duplicate_headers(df, headers_dupli)
 
     Editor.save(df, args.output, delimiter=args.delimiter)
