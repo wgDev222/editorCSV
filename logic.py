@@ -69,8 +69,10 @@ class Editor:
         return result_df
 
     @staticmethod
-    def delete_duplicates(df):
-        result_df = df.drop_duplicates()
+    def delete_duplicates(df, headers_to_dd):
+        result_df = df
+        for header in headers_to_dd:
+            result_df.drop_duplicates([header], inplace=True)
         return result_df
 
 
@@ -157,6 +159,21 @@ class Parser:
         else:
             return {}
 
+    @staticmethod
+    def delete_duplicates(arg):
+        try:
+            test_arg = arg[0]
+        except IndexError:
+            return []
+        headers_to_dd = []
+        if Validator.file(test_arg):
+            df = Editor.read(test_arg)
+            headers_to_dd = df['Header'].tolist()
+        else:
+            return arg
+
+        return headers_to_dd
+
 class Validator:
     @staticmethod
     def dir(path):
@@ -201,13 +218,13 @@ def modify_df(args, df):
     headers_rename = Parser.rename_headers(args.rename_headers)
     headers_dupli = Parser.duplicate_headers(args.duplicate_headers)
     header_to_strip = Parser.strip_values(args.strip_values)
+    headers_to_dd = Parser.delete_duplicates(args.dd)
 
     df = Editor.add_headers(df, headers_add)
     df = Editor.rem_headers(df, headers_remove)
     df = Editor.rename_headers(df, headers_rename)
     df = Editor.strip_values(df, header_to_strip)
-    if args.dd:
-        df = Editor.delete_duplicates(df)
+    df = Editor.delete_duplicates(df, headers_to_dd)
     df = Editor.duplicate_headers(df, headers_dupli)
 
     Editor.save(df, args.output, delimiter=args.delimiter)

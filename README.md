@@ -82,8 +82,18 @@ Negative values strip characters from the end
 Price:Cena Amount:Ilosc
 ```
 
+## --dd Deleting duplicates considering specified columns 
+
+```csv
+"Header"
+"Symbol"
+"Nazwa"
+```
+
+```bash
+Symbol Nazwa
+```
+
 ## -l Number of lines to skip from start of source file, works only with .csv.
 
 ## -d Set Delimiter for input and output
-
-## --dd Drop duplicates

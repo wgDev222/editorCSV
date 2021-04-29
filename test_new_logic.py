@@ -133,16 +133,17 @@ class TestEditor(unittest.TestCase):
         self.assertTrue(modified_df.columns.equals(check_df.columns))
 
     def test_deleting_duplicates(self):
-        source_file = 'Tests/Files/test.csv'
+        source_file = 'Tests/Files/test_duplicates.csv'
         output_df = Editor.read(source_file, 0)
         check_df = pd.read_csv(source_file, sep=';')
+        headers_to_dd = ['Nazwa', 'Symbol']
 
-        check_df = check_df.drop_duplicates()
+        for header in headers_to_dd:
+            check_df.drop_duplicates([header], inplace=True)
 
-        modified_df = Editor.delete_duplicates(output_df)
+        modified_df = Editor.delete_duplicates(output_df, headers_to_dd)
 
         self.assertTrue(modified_df.columns.equals(check_df.columns))
-
 
 
 class TestValidate(unittest.TestCase):
@@ -252,6 +253,23 @@ class TestParser(unittest.TestCase):
         headers = Parser.strip_values(arg)
         self.assertEqual(headers, check_headers)
 
+    def test_parsing_dd_headers_file(self):
+        arg = ['Tests/Files/h_dd.csv']
+
+        check_df = pd.read_csv(arg[0], sep=';')
+        check_headers = check_df['Header'].tolist()
+
+        headers = Parser.delete_duplicates(arg)
+        self.assertEqual(headers, check_headers)
+
+    def test_parsing_dd_headers_inline(self):
+        arg = ['Symbol', 'Nazwa']
+
+        check_headers = arg
+
+        headers = Parser.delete_duplicates(arg)
+
+        self.assertEqual(headers, check_headers)
 
 if __name__ == '__main__':
     unittest.main()
