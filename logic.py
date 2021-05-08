@@ -75,8 +75,41 @@ class Editor:
             result_df.drop_duplicates([header], inplace=True)
         return result_df
 
+    @staticmethod
+    def bleach_values(df, headers_to_bleach):
+        import bleach
+
+        for header in headers_to_bleach:
+            df[header] = df[header].apply(lambda val: bleach.clean(str(val)))
+        return df
 
 class Parser:
+
+    @staticmethod
+    def parse(arg, header=[], args_as_list=True):
+        try:
+            file = arg[0]
+        except IndexError:
+            return {}
+        result_headers = {}
+        if Validator.file(file):
+            df = Editor.read(file)
+            if args_as_list:
+                result_headers = df[header[0]].tolist()
+            else:
+                result_headers = df.set_index(header[0]).to_dict('dict')[header[1]]
+        else:
+            if args_as_list:
+                return arg
+            else:
+                for header in arg:
+                    items = header.split(':')
+                    if len(items) == 1:
+                        items.append('')
+                    result_headers[items[0]] = items[1]
+
+        return result_headers
+
     @staticmethod
     def new_headers(arg):
         try:
@@ -174,6 +207,10 @@ class Parser:
 
         return headers_to_dd
 
+    @staticmethod
+    def bleach_values(arg, header=['Header'], args_as_list=True):
+        return Parser.parse(arg, header, args_as_list)
+
 class Validator:
     @staticmethod
     def dir(path):
@@ -226,5 +263,8 @@ def modify_df(args, df):
     df = Editor.strip_values(df, header_to_strip)
     df = Editor.delete_duplicates(df, headers_to_dd)
     df = Editor.duplicate_headers(df, headers_dupli)
+    if args.bleach is not None:
+        header_to_bleach = Parser.bleach_values(args.bleach)
+        df = Editor.bleach_values(df, header_to_bleach)
 
     Editor.save(df, args.output, delimiter=args.delimiter)

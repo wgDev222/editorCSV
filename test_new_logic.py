@@ -130,7 +130,7 @@ class TestEditor(unittest.TestCase):
 
         modified_df = Editor.strip_values(output_df, values_to_strip)
 
-        self.assertTrue(modified_df.columns.equals(check_df.columns))
+        self.assertTrue(modified_df.equals(check_df))
 
     def test_deleting_duplicates(self):
         source_file = 'Tests/Files/test_duplicates.csv'
@@ -143,7 +143,20 @@ class TestEditor(unittest.TestCase):
 
         modified_df = Editor.delete_duplicates(output_df, headers_to_dd)
 
-        self.assertTrue(modified_df.columns.equals(check_df.columns))
+        self.assertTrue(modified_df.equals(check_df))
+
+    def _test_bleaching_values(self):
+        import bleach
+        source_file = 'Tests/Files/test_bleach.csv'
+        header_to_bleach = []
+        base_df = Editor.read(source_file)
+
+        base_df = base_df.apply(lambda val: bleach.clean(str(val), axis=0))
+
+        check_df = Editor.read(source_file)
+        check_df = Editor.bleach_values(check_df)
+
+        self.assertTrue(base_df.equals(check_df))
 
 
 class TestValidate(unittest.TestCase):
@@ -270,6 +283,37 @@ class TestParser(unittest.TestCase):
         headers = Parser.delete_duplicates(arg)
 
         self.assertEqual(headers, check_headers)
+
+    # New Version
+
+    def test_parsing_file_list(self):
+        arg = ['Tests/Files/test_parser_list.csv']
+        arg_list = Parser.parse(arg, header=['Header'], args_as_list=True)
+        base_list = ['Name', 'Surname', 'Age']
+
+        self.assertEqual(base_list, arg_list)
+
+    def test_parsing_inline_list(self):
+        arg = ['Name', 'Surname', 'Age']
+        arg_list = Parser.parse(arg, args_as_list=True)
+        base_list = ['Name', 'Surname', 'Age']
+
+        self.assertEqual(base_list, arg_list)
+
+    def test_paring_inline_dict(self):
+        arg = ['Name:Victor', 'Surname:Groch', 'Age:17']
+        arg_dict = Parser.parse(arg, header=['Header', 'Value'], args_as_list=False)
+        base_dict = {'Name': 'Victor', 'Surname': 'Groch', 'Age': '17'}
+
+        self.assertEqual(base_dict, arg_dict)
+
+    def test_parsing_file_dict(self):
+        arg = ['Tests/Files/test_parser_dict.csv']
+        arg_dict = Parser.parse(arg, header=['Header', 'Value'], args_as_list=False)
+        base_dict = {'Name': 'Victor', 'Surname': 'Groch', 'Age': '17'}
+
+        self.assertEqual(base_dict, arg_dict)
+
 
 if __name__ == '__main__':
     unittest.main()
