@@ -21,10 +21,15 @@ If you are using csv files as arguments first line must have headers, specified 
 Order of editing actions:
 1. Adding
 2. Removing
-3. Renaming
-4. Strping values
-5. Deleting duplicate rows
-6. Duplicating
+3. Splitting Columns
+4. Renaming
+5. Striping values
+6. Trim
+7. Deleting duplicate rows
+8. Duplicating Columns
+9. Bleach   
+10. Replace
+11. Split Rows
 
 ## -a Adding new headers by file or inline
 
@@ -49,6 +54,7 @@ family:Test Price:0
 ```bash
 Family Cena
 ```
+
 ## -n Renaming headers by file or inline
 
 ```csv
@@ -94,6 +100,53 @@ Price:Cena Amount:Ilosc
 Symbol Nazwa
 ```
 
+## -b Bleaching values in specified columns 
+
+```csv
+"Header"
+"Symbol"
+"Nazwa"
+```
+
+```bash
+Symbol Nazwa
+```
+
+## -e Replacing values in specified columns
+
+```csv
+"Column";"Replace"
+"Nazwa";"I-i"
+"Stan";"B-b"
+```
+
+```bash
+Nazwa:I-i Stan:B-b
+```
+
+## -f Splitting columns based on value
+
+```csv
+"Header"
+"Symbol"
+"Nazwa"
+```
+
+```bash
+Symbol Nazwa
+```
+
+## -t Trimming values from leading and trailing white characters from specified columns
+
+```csv
+"Header"
+"Symbol"
+"Nazwa"
+```
+
+```bash
+Symbol Nazwa
+```
 ## -l Number of lines to skip from start of source file, works only with .csv.
 
 ## -d Set Delimiter for input and output

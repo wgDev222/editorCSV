@@ -2,6 +2,8 @@ import pandas as pd
 import os.path
 
 STRING_QUOTING = True
+MAX_SPLIT_COLUMN_COUNT = 4
+COLS_SPLIT_BY = '|'
 
 class Editor:
     @staticmethod
@@ -79,14 +81,59 @@ class Editor:
     def bleach_values(df, headers_to_bleach):
         import bleach
 
+        def clean(val, if_empty='None'):
+            cleaned = bleach.clean(str(val)) or if_empty
+            return cleaned
+
         for header in headers_to_bleach:
-            df[header] = df[header].apply(lambda val: bleach.clean(str(val)))
+            df[header] = df[header].apply(lambda val: clean(val))
+
         return df
+
+    @staticmethod
+    def replace_values(df, headers_to_replace):
+        for column, rep in headers_to_replace.items():
+            a = rep.split('-')[0]
+            try:
+                b = rep.split('-')[1]
+            except IndexError:
+                b = ''
+            df[column] = df[column].apply(lambda val: val.replace(a, b))
+        return df
+
+    @staticmethod
+    def split_columns(df, columns_to_split):
+        for column in columns_to_split:
+            values_series = df[column]
+            new_cols = [column]
+            for i in range(1, MAX_SPLIT_COLUMN_COUNT):
+                new_col_name = column + str(i)
+                new_col_index = df.columns.get_loc(column) + i
+                new_cols.append(new_col_name)
+
+                df.insert(new_col_index, new_col_name, '', False)
+
+            for i, value in enumerate(values_series):
+                new_values = value.strip().split(COLS_SPLIT_BY)
+                for j, new_col in enumerate(new_cols):
+                    try:
+                        df[new_col][i] = new_values[j]
+                    except IndexError:
+                        continue
+
+        return df
+
+    @staticmethod
+    def trim_columns(df, columns_to_split):
+        for column in columns_to_split:
+            df[column] = df[column].apply(lambda val: str(val).strip())
+        return df
+
 
 class Parser:
 
     @staticmethod
-    def parse(arg, header=[], args_as_list=True):
+    def parse(arg, header=['Header'], args_as_list=True):
         try:
             file = arg[0]
         except IndexError:
@@ -106,7 +153,7 @@ class Parser:
                     items = header.split(':')
                     if len(items) == 1:
                         items.append('')
-                    result_headers[items[0]] = items[1]
+                    result_headers[items[0]] = ''.join(items[1:])
 
         return result_headers
 
@@ -208,8 +255,20 @@ class Parser:
         return headers_to_dd
 
     @staticmethod
-    def bleach_values(arg, header=['Header'], args_as_list=True):
-        return Parser.parse(arg, header, args_as_list)
+    def bleach_values(arg):
+        return Parser.parse(arg)
+
+    @staticmethod
+    def replace_values(arg):
+        return Parser.parse(arg, args_as_list=False, header=['Column', 'Replace'])
+
+    @staticmethod
+    def split_columns(arg):
+        return Parser.parse(arg)
+
+    @staticmethod
+    def trim_columns(arg):
+        return Parser.parse(arg)
 
 class Validator:
     @staticmethod
@@ -259,12 +318,21 @@ def modify_df(args, df):
 
     df = Editor.add_headers(df, headers_add)
     df = Editor.rem_headers(df, headers_remove)
+    if args.split_cols is not None:
+        columns_to_split = Parser.split_columns(args.split_cols)
+        df = Editor.split_columns(df, columns_to_split)
     df = Editor.rename_headers(df, headers_rename)
     df = Editor.strip_values(df, header_to_strip)
+    if args.trim_cols is not None:
+        columns_to_trim = Parser.trim_columns(args.trim_cols)
+        df = Editor.trim_columns(df, columns_to_trim)
     df = Editor.delete_duplicates(df, headers_to_dd)
     df = Editor.duplicate_headers(df, headers_dupli)
     if args.bleach is not None:
         header_to_bleach = Parser.bleach_values(args.bleach)
         df = Editor.bleach_values(df, header_to_bleach)
+    if args.replace is not None:
+        headers_to_replace = Parser.replace_values(args.replace)
+        df = Editor.replace_values(df, headers_to_replace)
 
     Editor.save(df, args.output, delimiter=args.delimiter)

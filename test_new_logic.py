@@ -145,19 +145,57 @@ class TestEditor(unittest.TestCase):
 
         self.assertTrue(modified_df.equals(check_df))
 
-    def _test_bleaching_values(self):
-        import bleach
+    def test_bleaching_values(self):
         source_file = 'Tests/Files/test_bleach.csv'
-        header_to_bleach = []
-        base_df = Editor.read(source_file)
-
-        base_df = base_df.apply(lambda val: bleach.clean(str(val), axis=0))
+        result_file = 'Tests/Files/bleached.csv'
+        base_df = Editor.read(result_file)
+        headers_to_bleach = ['Nazwa', 'Stan']
 
         check_df = Editor.read(source_file)
-        check_df = Editor.bleach_values(check_df)
+        check_df = Editor.bleach_values(check_df, headers_to_bleach)
 
         self.assertTrue(base_df.equals(check_df))
 
+    def test_replacing_values(self):
+        source_file = 'Tests/Files/test.csv'
+        base_df = Editor.read(source_file)
+        headers_to_replace = {'Nazwa': 'I-i', 'Stan': 'b-B'}
+
+        for column, rep in headers_to_replace.items():
+            a = rep.split('-')[0]
+            try:
+                b = rep.split('-')[1]
+            except IndexError:
+                b = ''
+            base_df[column] = base_df[column].apply(lambda val: val.replace(a, b))
+
+        check_df = Editor.read(source_file)
+        check_df = Editor.replace_values(check_df, headers_to_replace)
+
+        self.assertTrue(base_df.equals(check_df))
+
+    def test_splitting_cols(self):
+        source_file = 'Tests/Files/test_splitting_cols.csv'
+        result_file = 'Tests/Files/result_splitting_cols.csv'
+
+        base_df = Editor.read(result_file)
+        base_df.fillna('', inplace=True)
+
+        check_df = Editor.read(source_file)
+        check_df = Editor.split_columns(check_df, columns_to_split=['Nazwa'])
+
+        self.assertTrue(base_df.equals(check_df))
+
+    def test_trimming_cols(self):
+        source_file = 'Tests/Files/test_trimming_cols.csv'
+        result_file = 'Tests/Files/test.csv'
+
+        base_df = Editor.read(result_file)
+
+        check_df = Editor.read(source_file)
+        check_df = Editor.trim_columns(check_df, columns_to_split=['Nazwa', 'Stan'])
+
+        self.assertTrue(base_df.equals(check_df))
 
 class TestValidate(unittest.TestCase):
     def test_path_existence(self):
@@ -300,7 +338,7 @@ class TestParser(unittest.TestCase):
 
         self.assertEqual(base_list, arg_list)
 
-    def test_paring_inline_dict(self):
+    def test_parsing_inline_dict(self):
         arg = ['Name:Victor', 'Surname:Groch', 'Age:17']
         arg_dict = Parser.parse(arg, header=['Header', 'Value'], args_as_list=False)
         base_dict = {'Name': 'Victor', 'Surname': 'Groch', 'Age': '17'}
@@ -317,3 +355,4 @@ class TestParser(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

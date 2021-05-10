@@ -20,8 +20,23 @@ parser.add_argument('-c', '--duplicate_headers', action='store', type=str, nargs
 parser.add_argument('-s', '--strip_values', action='store', type=str, default=False, help='Strips values from specified column')
 parser.add_argument('--dd', action='store', type=str, nargs='*', default=[], help='Deletes duplicate rows')
 parser.add_argument('-b', '--bleach', action='store', nargs='*', default=None, help='Sanitize all values in files')
+parser.add_argument('-e', '--replace', action='store', nargs='*', default=None, help='Replace characters in specified columns')
+parser.add_argument('-f', '--split_cols', action='store', nargs='*', default=None, help='Split columns based on value')
+parser.add_argument('-t', '--trim_cols', action='store', nargs='*', default=None, help='Trim values from leading and trailing white character from specified columns')
+
 # parser.add_argument('-q', '--quotes', action='store', default=';', type=str, help='String quotes for result file')
 
 if __name__ == '__main__':
     args = parser.parse_args()
     execute_logic(args)
+
+
+# TODO:
+'''
+[Later]
+
+3.Splitting rows
+    Column
+    saving only splited rows
+'''
+
