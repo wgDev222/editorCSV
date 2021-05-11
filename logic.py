@@ -154,6 +154,19 @@ class Editor:
 
         return new_df
 
+    @staticmethod
+    def inner_join(df, file):
+        if Validator.file(file):
+            b_df = Editor.read(file)
+
+            for i in range(len(df)):
+                column = list(b_df.columns)[0]
+                if not df[column][i] in list(b_df[column]):
+                    df.drop(i, inplace=True)
+            return df
+        else:
+            print(f'Error: file {file} not found')
+
 class Parser:
 
     @staticmethod
@@ -180,6 +193,10 @@ class Parser:
                     result_headers[items[0]] = ''.join(items[1:])
 
         return result_headers
+
+    @staticmethod
+    def return_unmodified(arg):
+        return arg
 
     @staticmethod
     def new_headers(arg):
@@ -372,6 +389,7 @@ def modify_df(args, df):
         df = Editor.replace_values(df, headers_to_replace)
 
     Options.add(args.save_cols, df, Parser.save_cols, Editor.save_cols, args.output)
+    df = Options.add(args.inner_join, df, Parser.return_unmodified, Editor.inner_join)
 
     Editor.save(df, args.output, delimiter=args.delimiter)
 

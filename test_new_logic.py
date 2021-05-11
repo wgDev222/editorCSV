@@ -223,6 +223,18 @@ class TestEditor(unittest.TestCase):
 
         self.assertTrue(base_df.equals(check_df))
 
+    def test_inner_join(self):
+        source_file = 'Tests/Files/test.csv'
+        result_file = 'Tests/Files/result_inner_join.csv'
+        filter_file = 'Tests/Files/filter_inner_join.csv'
+
+        base_df = Editor.read(result_file)
+
+        check_df = Editor.read(source_file)
+        check_df = Editor.inner_join(check_df, filter_file)
+
+        self.assertTrue(base_df.equals(check_df))
+
 class TestValidate(unittest.TestCase):
     def test_path_existence(self):
         self.assertFalse(Validator.dir('Path'))

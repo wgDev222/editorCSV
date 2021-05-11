@@ -174,6 +174,15 @@ Symbol:DK12 Nazwa:Bike
 Symbol Nazwa
 ```
 
+## -i Save only rows specified in a file
+
+```csv
+"[Column-Name]"
+"Value1"
+"Value2"
+```
+
+
 ## -l Number of lines to skip from start of source file, works only with .csv.
 
 ## -d Set Delimiter for input and output

@@ -25,6 +25,7 @@ parser.add_argument('-f', '--split_cols', action='store', nargs='*', default=Non
 parser.add_argument('-t', '--trim_cols', action='store', nargs='*', default=None, help='Trim values from leading and trailing white character from specified columns')
 parser.add_argument('-j', '--exclude_rows', action='store', nargs='*', default=None, help='Exclude rows with specified values in columns')
 parser.add_argument('-g', '--save_cols', action='store', nargs='*', default=None, help='Save specified columns to additional a file  ')
+parser.add_argument('-i', '--inner_join', action='store', nargs='?', default=None, help='Save only rows specified in a file')
 # parser.add_argument('-q', '--quotes', action='store', default=';', type=str, help='String quotes for result file')
 
 if __name__ == '__main__':
@@ -37,11 +38,8 @@ if __name__ == '__main__':
 [Later]
 
 3. Splitting rows
-    Column
-    saving only splitted rows
+    Column delimiter
+    saving only splitted rows 
 
-
-4. Checking for file
-5. generating to new file specified columns
 '''
 
