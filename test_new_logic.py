@@ -197,6 +197,18 @@ class TestEditor(unittest.TestCase):
 
         self.assertTrue(base_df.equals(check_df))
 
+    def test_excluding_rows(self):
+        source_file = 'Tests/Files/test_excluding_rows.csv'
+        result_file = 'Tests/Files/result_excluding_rows.csv'
+        exclude_values = {'Symbol': 'BX'}
+        base_df = Editor.read(result_file)
+
+        check_df = Editor.read(source_file)
+        check_df = Editor.exclude_rows(check_df, exclude_values).reset_index(drop=True)
+        # Reset index because after removing rows indexes are not
+
+        self.assertTrue(base_df['Symbol'].equals(check_df['Symbol']))
+
 class TestValidate(unittest.TestCase):
     def test_path_existence(self):
         self.assertFalse(Validator.dir('Path'))

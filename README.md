@@ -6,6 +6,7 @@ Pandas python module is required
 ```bash
 pip3 install pandas 
 pip3 install openpyxl
+pip3 install bleach
 ```
 
 # Usage
@@ -19,17 +20,18 @@ python3 main.py file.csv -o test.csv -a [file.csv | Header:test...] -r [header1 
 If you are using csv files as arguments first line must have headers, specified below.
 
 Order of editing actions:
-1. Adding
-2. Removing
-3. Splitting Columns
-4. Renaming
-5. Striping values
-6. Trim
-7. Deleting duplicate rows
-8. Duplicating Columns
-9. Bleach   
-10. Replace
-11. Split Rows
+1. Removing rows by column value
+2. Adding
+3. Removing
+4. Splitting Columns
+5. Renaming
+6. Striping values
+7. Trim
+8. Deleting duplicate rows
+9. Duplicating Columns
+10. Bleach   
+11. Replace
+12. Split Rows
 
 ## -a Adding new headers by file or inline
 
@@ -147,6 +149,19 @@ Symbol Nazwa
 ```bash
 Symbol Nazwa
 ```
+
+## -g Exclude rows with specified values in columns
+
+```csv
+"Column";"Value"
+"Symbol";"DK12"
+"Nazwa";"Bike"
+```
+
+```bash
+Symbol:DK12 Nazwa:Bike
+```
+
 ## -l Number of lines to skip from start of source file, works only with .csv.
 
 ## -d Set Delimiter for input and output

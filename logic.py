@@ -129,6 +129,14 @@ class Editor:
             df[column] = df[column].apply(lambda val: str(val).strip())
         return df
 
+    @staticmethod
+    def exclude_rows(df, exclude_values):
+        for column, test in exclude_values.items():
+            for i in range(len(df)):
+                if df.loc[i, column] == test:
+                    df.drop(i, inplace=True)
+        return df
+
 
 class Parser:
 
@@ -270,6 +278,10 @@ class Parser:
     def trim_columns(arg):
         return Parser.parse(arg)
 
+    @staticmethod
+    def exclude_rows(arg):
+        return Parser.parse(arg, args_as_list=False, header=['Column', 'Value'])
+
 class Validator:
     @staticmethod
     def dir(path):
@@ -303,7 +315,7 @@ def execute_logic(args):
                 args.output = os.path.join(path, filename)
                 modify_df(args, df)
     else:
-        raise Exception('Error: Source file does not exist')
+        print('Error: Source file does not exist')
 
 def modify_df(args, df):
     if not args.output:
@@ -316,6 +328,9 @@ def modify_df(args, df):
     header_to_strip = Parser.strip_values(args.strip_values)
     headers_to_dd = Parser.delete_duplicates(args.dd)
 
+    if args.exclude_rows:
+        exclude_values = Parser.exclude_rows(args.exclude_rows)
+        df = Editor.exclude_rows(df, exclude_values)
     df = Editor.add_headers(df, headers_add)
     df = Editor.rem_headers(df, headers_remove)
     if args.split_cols is not None:
