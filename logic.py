@@ -137,6 +137,22 @@ class Editor:
                     df.drop(i, inplace=True)
         return df
 
+    @staticmethod
+    def save_cols(df, columns_to_save, output):
+        dfs = {}
+        AFFIX = 'generated'
+
+        path, filename = os.path.split(output)
+        new_filename = filename.split('.')[0] + f'_{AFFIX}.' + filename.split('.')[1]
+        new_path = os.path.join(path, new_filename)
+        for column in columns_to_save:
+            dfs[column] = df[column]
+
+        new_df = pd.DataFrame(dfs)
+
+        Editor.save(new_df, new_path)
+
+        return new_df
 
 class Parser:
 
@@ -282,6 +298,9 @@ class Parser:
     def exclude_rows(arg):
         return Parser.parse(arg, args_as_list=False, header=['Column', 'Value'])
 
+    @staticmethod
+    def save_cols(arg):
+        return Parser.parse(arg, header=['Column'])
 class Validator:
     @staticmethod
     def dir(path):
@@ -321,6 +340,8 @@ def modify_df(args, df):
     if not args.output:
         args.output = args.file
 
+    path = os.path.split(args.output)[0]
+
     headers_add = Parser.new_headers(args.add_headers)
     headers_remove = Parser.rem_headers(args.rem_headers)
     headers_rename = Parser.rename_headers(args.rename_headers)
@@ -350,4 +371,15 @@ def modify_df(args, df):
         headers_to_replace = Parser.replace_values(args.replace)
         df = Editor.replace_values(df, headers_to_replace)
 
+    Options.add(args.save_cols, df, Parser.save_cols, Editor.save_cols, args.output)
+
     Editor.save(df, args.output, delimiter=args.delimiter)
+
+class Options:
+    @staticmethod
+    def add(arg, df, parser, editor, *params):
+        if arg is not None:
+            arguments = parser(arg)
+            df = editor(df, arguments, *params)
+
+        return df

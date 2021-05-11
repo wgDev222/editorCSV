@@ -23,8 +23,8 @@ parser.add_argument('-b', '--bleach', action='store', nargs='*', default=None, h
 parser.add_argument('-e', '--replace', action='store', nargs='*', default=None, help='Replace characters in specified columns')
 parser.add_argument('-f', '--split_cols', action='store', nargs='*', default=None, help='Split columns based on value')
 parser.add_argument('-t', '--trim_cols', action='store', nargs='*', default=None, help='Trim values from leading and trailing white character from specified columns')
-parser.add_argument('-g', '--exclude_rows', action='store', nargs='*', default=None, help='Exclude rows with specified values in columns')
-
+parser.add_argument('-j', '--exclude_rows', action='store', nargs='*', default=None, help='Exclude rows with specified values in columns')
+parser.add_argument('-g', '--save_cols', action='store', nargs='*', default=None, help='Save specified columns to additional a file  ')
 # parser.add_argument('-q', '--quotes', action='store', default=';', type=str, help='String quotes for result file')
 
 if __name__ == '__main__':
@@ -39,10 +39,9 @@ if __name__ == '__main__':
 3. Splitting rows
     Column
     saving only splitted rows
-    
-4.  
-Column;Exclude values
 
 
+4. Checking for file
+5. generating to new file specified columns
 '''
 

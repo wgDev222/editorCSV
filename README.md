@@ -150,7 +150,7 @@ Symbol Nazwa
 Symbol Nazwa
 ```
 
-## -g Exclude rows with specified values in columns
+## -j Exclude rows with specified values in columns
 
 ```csv
 "Column";"Value"
@@ -160,6 +160,18 @@ Symbol Nazwa
 
 ```bash
 Symbol:DK12 Nazwa:Bike
+```
+
+## -g Save specified columns to additional file next to output file 
+
+```csv
+"Column"
+"Symbol"
+"Nazwa"
+```
+
+```bash
+Symbol Nazwa
 ```
 
 ## -l Number of lines to skip from start of source file, works only with .csv.

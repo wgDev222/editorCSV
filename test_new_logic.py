@@ -205,9 +205,23 @@ class TestEditor(unittest.TestCase):
 
         check_df = Editor.read(source_file)
         check_df = Editor.exclude_rows(check_df, exclude_values).reset_index(drop=True)
-        # Reset index because after removing rows indexes are not
+        # Reset index because after removing rows indexes are misplaced
 
-        self.assertTrue(base_df['Symbol'].equals(check_df['Symbol']))
+        self.assertTrue(base_df.equals(check_df))
+
+    def test_saving_cols(self):
+        source_file = 'Tests/Files/test.csv'
+        result_file = 'Tests/Files/result_saving_cols.csv'
+        columns_to_save = ['Symbol', 'Nazwa']
+
+        base_df = Editor.read(result_file)
+
+        check_df = Editor.read(source_file)
+        check_df = Editor.save_cols(check_df, columns_to_save, source_file)
+
+        os.remove('Tests/Files/test_generated.csv')
+
+        self.assertTrue(base_df.equals(check_df))
 
 class TestValidate(unittest.TestCase):
     def test_path_existence(self):
