@@ -196,7 +196,6 @@ class Parser:
                         result_headers[items[0]] = [result_headers[items[0]], ''.join(items[1:])]
                     else:
                         result_headers[items[0]] = ''.join(items[1:])
-        print(result_headers)
 
         return result_headers
 
