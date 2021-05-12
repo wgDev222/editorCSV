@@ -131,10 +131,12 @@ class Editor:
 
     @staticmethod
     def exclude_rows(df, exclude_values):
-        for column, test in exclude_values.items():
+        for column, tests in exclude_values.items():
             for i in range(len(df)):
-                if df.loc[i, column] == test:
-                    df.drop(i, inplace=True)
+                for test in list(tests):
+                    if df.loc[i, column] == test:
+                        df.drop(i, inplace=True)
+                        break
         return df
 
     @staticmethod
@@ -190,7 +192,11 @@ class Parser:
                     items = header.split(':')
                     if len(items) == 1:
                         items.append('')
-                    result_headers[items[0]] = ''.join(items[1:])
+                    if items[0] in result_headers:
+                        result_headers[items[0]] = [result_headers[items[0]], ''.join(items[1:])]
+                    else:
+                        result_headers[items[0]] = ''.join(items[1:])
+        print(result_headers)
 
         return result_headers
 

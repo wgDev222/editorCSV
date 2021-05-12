@@ -200,7 +200,7 @@ class TestEditor(unittest.TestCase):
     def test_excluding_rows(self):
         source_file = 'Tests/Files/test_excluding_rows.csv'
         result_file = 'Tests/Files/result_excluding_rows.csv'
-        exclude_values = {'Symbol': 'BX'}
+        exclude_values = {'Symbol': ['BX']}
         base_df = Editor.read(result_file)
 
         check_df = Editor.read(source_file)
