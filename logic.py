@@ -131,6 +131,7 @@ class Editor:
 
     @staticmethod
     def exclude_rows(df, exclude_values):
+        print(exclude_values)
         for column, tests in exclude_values.items():
             for i in range(len(df)):
                 for test in list(tests):
@@ -165,6 +166,7 @@ class Editor:
                 column = list(b_df.columns)[0]
                 if not df[column][i] in list(b_df[column]):
                     df.drop(i, inplace=True)
+
             return df
         else:
             print(f'Error: file {file} not found')
@@ -193,7 +195,7 @@ class Parser:
                     if len(items) == 1:
                         items.append('')
                     if items[0] in result_headers:
-                        result_headers[items[0]] = [result_headers[items[0]], ''.join(items[1:])]
+                        result_headers[items[0]] = [*result_headers[items[0]], ''.join(items[1:])]
                     else:
                         result_headers[items[0]] = ''.join(items[1:])
 
