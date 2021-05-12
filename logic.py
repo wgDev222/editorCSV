@@ -162,6 +162,8 @@ class Editor:
         if Validator.file(file):
             b_df = Editor.read(file)
 
+            df = df.reset_index(drop=True)
+
             for i in range(len(df)):
                 column = list(b_df.columns)[0]
                 if not df[column][i] in list(b_df[column]):
