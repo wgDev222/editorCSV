@@ -103,6 +103,7 @@ class Editor:
 
     @staticmethod
     def split_columns(df, columns_to_split):
+        print(columns_to_split)
         for column in columns_to_split:
             values_series = df[column]
             new_cols = [column]
@@ -114,7 +115,7 @@ class Editor:
                 df.insert(new_col_index, new_col_name, '', False)
 
             for i, value in enumerate(values_series):
-                new_values = value.strip().split(COLS_SPLIT_BY)
+                new_values = str(value).strip().split(COLS_SPLIT_BY)
                 for j, new_col in enumerate(new_cols):
                     try:
                         df[new_col][i] = new_values[j]
