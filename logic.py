@@ -2,7 +2,7 @@ import pandas as pd
 import os.path
 
 STRING_QUOTING = True
-MAX_SPLIT_COLUMN_COUNT = 4
+MAX_SPLIT_COLUMN_COUNT = 9
 COLS_SPLIT_BY = '|'
 
 class Editor:
@@ -103,9 +103,8 @@ class Editor:
 
     @staticmethod
     def split_columns(df, columns_to_split):
-        print(columns_to_split)
         for column in columns_to_split:
-            values_series = df[column]
+
             new_cols = [column]
             for i in range(1, MAX_SPLIT_COLUMN_COUNT):
                 new_col_name = column + str(i)
@@ -114,13 +113,15 @@ class Editor:
 
                 df.insert(new_col_index, new_col_name, '', False)
 
-            for i, value in enumerate(values_series):
+            values_series = df[column]
+
+            for k, value in enumerate(values_series):
                 new_values = str(value).strip().split(COLS_SPLIT_BY)
-                for j, new_col in enumerate(new_cols):
+                for j, new_col in enumerate(new_cols[:len(new_values)]):
                     try:
-                        df[new_col][i] = new_values[j]
+                        df[new_col].iloc[k] = new_values[j]
                     except IndexError:
-                        continue
+                        break
 
         return df
 
@@ -132,7 +133,7 @@ class Editor:
 
     @staticmethod
     def exclude_rows(df, exclude_values):
-        print(exclude_values)
+        # print(exclude_values)
         for column, tests in exclude_values.items():
             for i in range(len(df)):
                 for test in list(tests):
